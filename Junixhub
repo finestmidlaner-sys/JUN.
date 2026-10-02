@@ -1,0 +1,717 @@
+--// JUNIX HUB - COMPACT UI
+--// LocalScript / Roblox Studio
+--// Features:
+--// • Compact window
+--// • Minimize to logo
+--// • Restore animation
+--// • Drag window
+--// • Resize from bottom-right corner
+--// • Roblox profile/status display
+
+local Players = game:GetService("Players")
+local TweenService = game:GetService("TweenService")
+local UserInputService = game:GetService("UserInputService")
+
+local Player = Players.LocalPlayer
+local PlayerGui = Player:WaitForChild("PlayerGui")
+
+--------------------------------------------------
+-- REMOVE OLD VERSION
+--------------------------------------------------
+
+local old = PlayerGui:FindFirstChild("JUNIX_HUB")
+if old then
+	old:Destroy()
+end
+
+--------------------------------------------------
+-- COLORS
+--------------------------------------------------
+
+local BG = Color3.fromRGB(7, 13, 23)
+local PANEL = Color3.fromRGB(13, 22, 36)
+local PANEL2 = Color3.fromRGB(19, 32, 50)
+local BLUE = Color3.fromRGB(0, 130, 255)
+local BLUE2 = Color3.fromRGB(30, 160, 255)
+local WHITE = Color3.fromRGB(235, 242, 255)
+local GRAY = Color3.fromRGB(145, 160, 180)
+local GREEN = Color3.fromRGB(0, 220, 120)
+
+--------------------------------------------------
+-- GUI
+--------------------------------------------------
+
+local Gui = Instance.new("ScreenGui")
+Gui.Name = "JUNIX_HUB"
+Gui.ResetOnSpawn = false
+Gui.IgnoreGuiInset = true
+Gui.Parent = PlayerGui
+
+--------------------------------------------------
+-- MAIN WINDOW
+--------------------------------------------------
+
+local Main = Instance.new("Frame")
+Main.Name = "Main"
+Main.Size = UDim2.fromOffset(500, 305)
+Main.Position = UDim2.fromScale(0.5, 0.5)
+Main.AnchorPoint = Vector2.new(0.5, 0.5)
+Main.BackgroundColor3 = BG
+Main.BorderSizePixel = 0
+Main.ClipsDescendants = true
+Main.Parent = Gui
+
+local MainCorner = Instance.new("UICorner")
+MainCorner.CornerRadius = UDim.new(0, 10)
+MainCorner.Parent = Main
+
+local MainStroke = Instance.new("UIStroke")
+MainStroke.Color = BLUE
+MainStroke.Transparency = 0.3
+MainStroke.Thickness = 1
+MainStroke.Parent = Main
+
+--------------------------------------------------
+-- FLOATING LOGO
+--------------------------------------------------
+
+local LogoButton = Instance.new("TextButton")
+LogoButton.Name = "FloatingLogo"
+LogoButton.Size = UDim2.fromOffset(58, 58)
+LogoButton.Position = UDim2.fromScale(0.5, 0.5)
+LogoButton.AnchorPoint = Vector2.new(0.5, 0.5)
+LogoButton.BackgroundColor3 = BG
+LogoButton.Text = "JH"
+LogoButton.TextColor3 = WHITE
+LogoButton.TextSize = 17
+LogoButton.Font = Enum.Font.GothamBold
+LogoButton.Visible = false
+LogoButton.Parent = Gui
+
+local LogoCorner = Instance.new("UICorner")
+LogoCorner.CornerRadius = UDim.new(1, 0)
+LogoCorner.Parent = LogoButton
+
+local LogoStroke = Instance.new("UIStroke")
+LogoStroke.Color = BLUE
+LogoStroke.Thickness = 2
+LogoStroke.Parent = LogoButton
+
+--------------------------------------------------
+-- HEADER
+--------------------------------------------------
+
+local Header = Instance.new("Frame")
+Header.Size = UDim2.new(1, 0, 0, 46)
+Header.BackgroundColor3 = Color3.fromRGB(6, 12, 21)
+Header.BorderSizePixel = 0
+Header.Parent = Main
+
+local HeaderCorner = Instance.new("UICorner")
+HeaderCorner.CornerRadius = UDim.new(0, 10)
+HeaderCorner.Parent = Header
+
+local Logo = Instance.new("TextLabel")
+Logo.Size = UDim2.fromOffset(32, 32)
+Logo.Position = UDim2.fromOffset(8, 7)
+Logo.BackgroundColor3 = BLUE
+Logo.Text = "JH"
+Logo.TextColor3 = WHITE
+Logo.TextSize = 12
+Logo.Font = Enum.Font.GothamBold
+Logo.Parent = Header
+
+local LogoC = Instance.new("UICorner")
+LogoC.CornerRadius = UDim.new(0, 7)
+LogoC.Parent = Logo
+
+local Title = Instance.new("TextLabel")
+Title.Size = UDim2.fromOffset(150, 23)
+Title.Position = UDim2.fromOffset(48, 4)
+Title.BackgroundTransparency = 1
+Title.Text = "JUNIX HUB"
+Title.TextColor3 = WHITE
+Title.TextSize = 17
+Title.Font = Enum.Font.GothamBold
+Title.TextXAlignment = Enum.TextXAlignment.Left
+Title.Parent = Header
+
+local Subtitle = Instance.new("TextLabel")
+Subtitle.Size = UDim2.fromOffset(150, 15)
+Subtitle.Position = UDim2.fromOffset(49, 25)
+Subtitle.BackgroundTransparency = 1
+Subtitle.Text = "Compact Edition"
+Subtitle.TextColor3 = GRAY
+Subtitle.TextSize = 8
+Subtitle.Font = Enum.Font.Gotham
+Subtitle.TextXAlignment = Enum.TextXAlignment.Left
+Subtitle.Parent = Header
+
+--------------------------------------------------
+-- ONLINE
+--------------------------------------------------
+
+local Online = Instance.new("TextLabel")
+Online.Size = UDim2.fromOffset(70, 24)
+Online.Position = UDim2.new(1, -102, 0, 11)
+Online.BackgroundColor3 = PANEL2
+Online.Text = "● Online"
+Online.TextColor3 = GREEN
+Online.TextSize = 9
+Online.Font = Enum.Font.GothamMedium
+Online.Parent = Header
+
+local OnlineCorner = Instance.new("UICorner")
+OnlineCorner.CornerRadius = UDim.new(1, 0)
+OnlineCorner.Parent = Online
+
+--------------------------------------------------
+-- MINIMIZE BUTTON
+--------------------------------------------------
+
+local Minimize = Instance.new("TextButton")
+Minimize.Size = UDim2.fromOffset(27, 27)
+Minimize.Position = UDim2.new(1, -32, 0, 8)
+Minimize.BackgroundTransparency = 1
+Minimize.Text = "×"
+Minimize.TextColor3 = BLUE2
+Minimize.TextSize = 21
+Minimize.Font = Enum.Font.GothamBold
+Minimize.Parent = Header
+
+--------------------------------------------------
+-- SIDEBAR
+--------------------------------------------------
+
+local Sidebar = Instance.new("Frame")
+Sidebar.Size = UDim2.new(0, 96, 1, -46)
+Sidebar.Position = UDim2.fromOffset(0, 46)
+Sidebar.BackgroundColor3 = Color3.fromRGB(8, 16, 28)
+Sidebar.BorderSizePixel = 0
+Sidebar.Parent = Main
+
+local menu = {
+	{"⌂", "Home"},
+	{"✿", "Farming"},
+	{"▣", "Shop"},
+	{"◉", "Eggs"},
+	{"◆", "Teleport"},
+	{"⚙", "Settings"}
+}
+
+for i, item in ipairs(menu) do
+
+	local Button = Instance.new("TextButton")
+	Button.Size = UDim2.new(1, -10, 0, 33)
+	Button.Position = UDim2.new(0, 5, 0, 8 + ((i - 1) * 37))
+	Button.BackgroundColor3 =
+		i == 1 and BLUE or Color3.fromRGB(8, 16, 28)
+
+	Button.BorderSizePixel = 0
+	Button.Text = item[1] .. "  " .. item[2]
+	Button.TextColor3 = WHITE
+	Button.TextSize = 9
+	Button.Font = Enum.Font.GothamMedium
+	Button.TextXAlignment = Enum.TextXAlignment.Left
+	Button.Parent = Sidebar
+
+	local Corner = Instance.new("UICorner")
+	Corner.CornerRadius = UDim.new(0, 6)
+	Corner.Parent = Button
+
+	Button.MouseButton1Click:Connect(function()
+
+		for _, v in ipairs(Sidebar:GetChildren()) do
+			if v:IsA("TextButton") then
+				v.BackgroundColor3 =
+					Color3.fromRGB(8, 16, 28)
+			end
+		end
+
+		Button.BackgroundColor3 = BLUE
+	end)
+end
+
+--------------------------------------------------
+-- CONTENT
+--------------------------------------------------
+
+local Content = Instance.new("Frame")
+Content.Size = UDim2.new(0, 255, 1, -56)
+Content.Position = UDim2.fromOffset(103, 56)
+Content.BackgroundTransparency = 1
+Content.Parent = Main
+
+--------------------------------------------------
+-- WELCOME
+--------------------------------------------------
+
+local Welcome = Instance.new("Frame")
+Welcome.Size = UDim2.new(1, 0, 0, 50)
+Welcome.BackgroundColor3 = PANEL
+Welcome.BorderSizePixel = 0
+Welcome.Parent = Content
+
+local WC = Instance.new("UICorner")
+WC.CornerRadius = UDim.new(0, 8)
+WC.Parent = Welcome
+
+local WelcomeTitle = Instance.new("TextLabel")
+WelcomeTitle.Size = UDim2.new(1, -15, 0, 22)
+WelcomeTitle.Position = UDim2.fromOffset(8, 6)
+WelcomeTitle.BackgroundTransparency = 1
+WelcomeTitle.Text = "JUNIX HUB"
+WelcomeTitle.TextColor3 = WHITE
+WelcomeTitle.TextSize = 16
+WelcomeTitle.Font = Enum.Font.GothamBold
+WelcomeTitle.TextXAlignment = Enum.TextXAlignment.Left
+WelcomeTitle.Parent = Welcome
+
+local WelcomeSub = Instance.new("TextLabel")
+WelcomeSub.Size = UDim2.new(1, -15, 0, 15)
+WelcomeSub.Position = UDim2.fromOffset(9, 28)
+WelcomeSub.BackgroundTransparency = 1
+WelcomeSub.Text = "Small • Clean • Adjustable"
+WelcomeSub.TextColor3 = GRAY
+WelcomeSub.TextSize = 8
+WelcomeSub.Font = Enum.Font.Gotham
+WelcomeSub.TextXAlignment = Enum.TextXAlignment.Left
+WelcomeSub.Parent = Welcome
+
+--------------------------------------------------
+-- FEATURES
+--------------------------------------------------
+
+local Features = Instance.new("Frame")
+Features.Size = UDim2.new(1, 0, 0, 200)
+Features.Position = UDim2.fromOffset(0, 57)
+Features.BackgroundColor3 = PANEL
+Features.BorderSizePixel = 0
+Features.Parent = Content
+
+local FC = Instance.new("UICorner")
+FC.CornerRadius = UDim.new(0, 8)
+FC.Parent = Features
+
+local FeatureTitle = Instance.new("TextLabel")
+FeatureTitle.Size = UDim2.new(1, -15, 0, 22)
+FeatureTitle.Position = UDim2.fromOffset(8, 5)
+FeatureTitle.BackgroundTransparency = 1
+FeatureTitle.Text = "⚡ Quick Features"
+FeatureTitle.TextColor3 = WHITE
+FeatureTitle.TextSize = 12
+FeatureTitle.Font = Enum.Font.GothamBold
+FeatureTitle.TextXAlignment = Enum.TextXAlignment.Left
+FeatureTitle.Parent = Features
+
+local featureNames = {
+	"Auto Buy Seeds",
+	"Auto Place Egg",
+	"Auto Sell Fruits",
+	"Auto Hatch Egg",
+	"Auto Collect",
+	"Auto Buy Shops",
+	"Auto Water",
+	"Select Fruit"
+}
+
+for i, name in ipairs(featureNames) do
+
+	local column = (i - 1) % 2
+	local row = math.floor((i - 1) / 2)
+
+	local Button = Instance.new("TextButton")
+	Button.Size = UDim2.fromOffset(117, 34)
+	Button.Position = UDim2.new(
+		0,
+		7 + column * 123,
+		0,
+		32 + row * 41
+	)
+
+	Button.BackgroundColor3 = PANEL2
+	Button.BorderSizePixel = 0
+	Button.Text = name
+	Button.TextColor3 = WHITE
+	Button.TextSize = 7
+	Button.Font = Enum.Font.GothamMedium
+	Button.TextXAlignment = Enum.TextXAlignment.Left
+	Button.Parent = Features
+
+	local C = Instance.new("UICorner")
+	C.CornerRadius = UDim.new(0, 6)
+	C.Parent = Button
+
+	local Toggle = Instance.new("Frame")
+	Toggle.Size = UDim2.fromOffset(24, 13)
+	Toggle.Position = UDim2.new(1, -30, 0.5, -6)
+	Toggle.BackgroundColor3 = Color3.fromRGB(45, 60, 80)
+	Toggle.Parent = Button
+
+	local TC = Instance.new("UICorner")
+	TC.CornerRadius = UDim.new(1, 0)
+	TC.Parent = Toggle
+
+	local Dot = Instance.new("Frame")
+	Dot.Size = UDim2.fromOffset(9, 9)
+	Dot.Position = UDim2.fromOffset(2, 2)
+	Dot.BackgroundColor3 = GRAY
+	Dot.Parent = Toggle
+
+	local DC = Instance.new("UICorner")
+	DC.CornerRadius = UDim.new(1, 0)
+	DC.Parent = Dot
+
+	local enabled = false
+
+	Button.MouseButton1Click:Connect(function()
+
+		enabled = not enabled
+
+		if enabled then
+
+			Toggle.BackgroundColor3 = BLUE
+			Dot.BackgroundColor3 = WHITE
+			Dot.Position = UDim2.new(1, -11, 0, 2)
+
+		else
+
+			Toggle.BackgroundColor3 =
+				Color3.fromRGB(45, 60, 80)
+
+			Dot.BackgroundColor3 = GRAY
+			Dot.Position = UDim2.fromOffset(2, 2)
+
+		end
+	end)
+end
+
+--------------------------------------------------
+-- PROFILE
+--------------------------------------------------
+
+local Profile = Instance.new("Frame")
+Profile.Size = UDim2.fromOffset(130, 249)
+Profile.Position = UDim2.new(1, -140, 0, 56)
+Profile.BackgroundColor3 = PANEL
+Profile.BorderSizePixel = 0
+Profile.Parent = Main
+
+local PC = Instance.new("UICorner")
+PC.CornerRadius = UDim.new(0, 8)
+PC.Parent = Profile
+
+local ProfileTitle = Instance.new("TextLabel")
+ProfileTitle.Size = UDim2.new(1, -12, 0, 22)
+ProfileTitle.Position = UDim2.fromOffset(6, 5)
+ProfileTitle.BackgroundTransparency = 1
+ProfileTitle.Text = "Profile / Status"
+ProfileTitle.TextColor3 = WHITE
+ProfileTitle.TextSize = 10
+ProfileTitle.Font = Enum.Font.GothamBold
+ProfileTitle.TextXAlignment = Enum.TextXAlignment.Left
+ProfileTitle.Parent = Profile
+
+--------------------------------------------------
+-- AVATAR
+--------------------------------------------------
+
+local Avatar = Instance.new("ImageLabel")
+Avatar.Size = UDim2.fromOffset(48, 48)
+Avatar.Position = UDim2.new(0.5, -24, 0, 31)
+Avatar.BackgroundColor3 = PANEL2
+Avatar.Parent = Profile
+
+local AvatarCorner = Instance.new("UICorner")
+AvatarCorner.CornerRadius = UDim.new(1, 0)
+AvatarCorner.Parent = Avatar
+
+Avatar.Image =
+	"https://www.roblox.com/headshot-thumbnail/image?userId="
+	.. Player.UserId
+	.. "&width=150&height=150&format=png"
+
+--------------------------------------------------
+-- PROFILE TEXT
+--------------------------------------------------
+
+local DisplayName = Instance.new("TextLabel")
+DisplayName.Size = UDim2.new(1, -10, 0, 20)
+DisplayName.Position = UDim2.fromOffset(5, 82)
+DisplayName.BackgroundTransparency = 1
+DisplayName.Text = Player.DisplayName
+DisplayName.TextColor3 = WHITE
+DisplayName.TextSize = 12
+DisplayName.Font = Enum.Font.GothamBold
+DisplayName.Parent = Profile
+
+local Username = Instance.new("TextLabel")
+Username.Size = UDim2.new(1, -10, 0, 17)
+Username.Position = UDim2.fromOffset(5, 101)
+Username.BackgroundTransparency = 1
+Username.Text = "@" .. Player.Name
+Username.TextColor3 = BLUE2
+Username.TextSize = 8
+Username.Font = Enum.Font.Gotham
+Username.Parent = Profile
+
+local Status = Instance.new("TextLabel")
+Status.Size = UDim2.fromOffset(65, 21)
+Status.Position = UDim2.new(0.5, -32, 0, 124)
+Status.BackgroundColor3 = Color3.fromRGB(12, 65, 50)
+Status.Text = "● Online"
+Status.TextColor3 = GREEN
+Status.TextSize = 8
+Status.Font = Enum.Font.GothamMedium
+Status.Parent = Profile
+
+local StatusCorner = Instance.new("UICorner")
+StatusCorner.CornerRadius = UDim.new(1, 0)
+StatusCorner.Parent = Status
+
+local Info = Instance.new("TextLabel")
+Info.Size = UDim2.new(1, -12, 0, 95)
+Info.Position = UDim2.fromOffset(6, 154)
+Info.BackgroundTransparency = 1
+
+Info.Text =
+	"Display Name\n" ..
+	Player.DisplayName ..
+	"\n\nUser ID\n" ..
+	tostring(Player.UserId) ..
+	"\n\nAccount Age\n" ..
+	tostring(Player.AccountAge) .. " days"
+
+Info.TextColor3 = GRAY
+Info.TextSize = 8
+Info.Font = Enum.Font.Gotham
+Info.TextXAlignment = Enum.TextXAlignment.Left
+Info.TextYAlignment = Enum.TextYAlignment.Top
+Info.Parent = Profile
+
+--------------------------------------------------
+-- BOTTOM-RIGHT RESIZE HANDLE
+--------------------------------------------------
+
+local ResizeHandle = Instance.new("TextButton")
+ResizeHandle.Name = "ResizeHandle"
+ResizeHandle.Size = UDim2.fromOffset(22, 22)
+ResizeHandle.Position = UDim2.new(1, -22, 1, -22)
+ResizeHandle.BackgroundTransparency = 1
+ResizeHandle.Text = "◢"
+ResizeHandle.TextColor3 = BLUE2
+ResizeHandle.TextSize = 13
+ResizeHandle.Font = Enum.Font.GothamBold
+ResizeHandle.Parent = Main
+
+--------------------------------------------------
+-- DRAG WINDOW
+--------------------------------------------------
+
+local dragging = false
+local dragStart
+local startPosition
+
+Header.InputBegan:Connect(function(input)
+
+	if input.UserInputType == Enum.UserInputType.MouseButton1
+		or input.UserInputType == Enum.UserInputType.Touch then
+
+		dragging = true
+		dragStart = input.Position
+		startPosition = Main.Position
+	end
+end)
+
+Header.InputEnded:Connect(function(input)
+
+	if input.UserInputType == Enum.UserInputType.MouseButton1
+		or input.UserInputType == Enum.UserInputType.Touch then
+
+		dragging = false
+	end
+end)
+
+UserInputService.InputChanged:Connect(function(input)
+
+	if dragging then
+
+		if input.UserInputType == Enum.UserInputType.MouseMovement
+			or input.UserInputType == Enum.UserInputType.Touch then
+
+			local delta = input.Position - dragStart
+
+			Main.Position = UDim2.new(
+				startPosition.X.Scale,
+				startPosition.X.Offset + delta.X,
+				startPosition.Y.Scale,
+				startPosition.Y.Offset + delta.Y
+			)
+		end
+	end
+end)
+
+--------------------------------------------------
+-- RESIZE
+--------------------------------------------------
+
+local resizing = false
+local resizeStart
+local startSize
+
+ResizeHandle.InputBegan:Connect(function(input)
+
+	if input.UserInputType == Enum.UserInputType.MouseButton1
+		or input.UserInputType == Enum.UserInputType.Touch then
+
+		resizing = true
+		resizeStart = input.Position
+		startSize = Main.AbsoluteSize
+	end
+end)
+
+UserInputService.InputChanged:Connect(function(input)
+
+	if resizing then
+
+		if input.UserInputType == Enum.UserInputType.MouseMovement
+			or input.UserInputType == Enum.UserInputType.Touch then
+
+			local delta = input.Position - resizeStart
+
+			local newWidth =
+				math.clamp(
+					startSize.X + delta.X,
+					430,
+					650
+				)
+
+			local newHeight =
+				math.clamp(
+					startSize.Y + delta.Y,
+					270,
+					400
+				)
+
+			Main.Size =
+				UDim2.fromOffset(
+					newWidth,
+					newHeight
+				)
+		end
+	end
+end)
+
+UserInputService.InputEnded:Connect(function(input)
+
+	if input.UserInputType == Enum.UserInputType.MouseButton1
+		or input.UserInputType == Enum.UserInputType.Touch then
+
+		resizing = false
+	end
+end)
+
+--------------------------------------------------
+-- MINIMIZE ANIMATION
+--------------------------------------------------
+
+local minimized = false
+
+Minimize.MouseButton1Click:Connect(function()
+
+	if minimized then
+		return
+	end
+
+	minimized = true
+
+	local savedPosition = Main.Position
+
+	local tween = TweenService:Create(
+		Main,
+		TweenInfo.new(
+			0.28,
+			Enum.EasingStyle.Quad,
+			Enum.EasingDirection.In
+		),
+		{
+			Size = UDim2.fromOffset(0, 0),
+			BackgroundTransparency = 1
+		}
+	)
+
+	tween:Play()
+
+	tween.Completed:Connect(function()
+
+		Main.Visible = false
+
+		LogoButton.Position = UDim2.new(
+			savedPosition.X.Scale,
+			savedPosition.X.Offset,
+			savedPosition.Y.Scale,
+			savedPosition.Y.Offset
+		)
+
+		LogoButton.Visible = true
+
+		LogoButton.Size = UDim2.fromOffset(0, 0)
+
+		local restoreLogo = TweenService:Create(
+			LogoButton,
+			TweenInfo.new(
+				0.22,
+				Enum.EasingStyle.Back,
+				Enum.EasingDirection.Out
+			),
+			{
+				Size = UDim2.fromOffset(58, 58)
+			}
+		)
+
+		restoreLogo:Play()
+	end)
+end)
+
+--------------------------------------------------
+-- RESTORE ANIMATION
+--------------------------------------------------
+
+LogoButton.MouseButton1Click:Connect(function()
+
+	if not minimized then
+		return
+	end
+
+	minimized = false
+
+	local restorePosition = LogoButton.Position
+
+	LogoButton.Visible = false
+
+	Main.Position = restorePosition
+	Main.Size = UDim2.fromOffset(0, 0)
+	Main.BackgroundTransparency = 1
+	Main.Visible = true
+
+	local tween = TweenService:Create(
+		Main,
+		TweenInfo.new(
+			0.30,
+			Enum.EasingStyle.Back,
+			Enum.EasingDirection.Out
+		),
+		{
+			Size = UDim2.fromOffset(500, 305),
+			BackgroundTransparency = 0
+		}
+	)
+
+	tween:Play()
+end)
+
+--------------------------------------------------
+-- START
+--------------------------------------------------
+
+print("JUNIX HUB Compact UI loaded.")
